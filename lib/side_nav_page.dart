@@ -13,21 +13,30 @@ class _SideNavPageState extends State<SideNavPage> {
     return Drawer(
       child: Column(
         children: [
-          const DrawerHeader(child: Text("StoreFront")),
+          const DrawerHeader(child: Center(child: Text("Shift Link"))),
+          ListTile(
+            leading: const Icon(Icons.dashboard),
+            title: const Text(
+              "Dashboard",
+              style: TextStyle(color: Colors.white),
+            ),
+            tileColor: Colors.blue[100],
+            onTap: () {},
+          ),
           ListTile(
             leading: const Icon(Icons.health_and_safety_outlined),
             title: const Text(
               "Safety Management Plan",
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
-            tileColor: Colors.blue[100],
+            // tileColor: Colors.blue[100],
             onTap: () {},
           ),
           ListTile(
             leading: const Icon(Icons.report),
             title: const Text(
               "Report Hazard",
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             onTap: () {},
           ),
@@ -35,7 +44,7 @@ class _SideNavPageState extends State<SideNavPage> {
             leading: const Icon(Icons.settings),
             title: const Text(
               "Settings",
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             onTap: () {},
           ),
@@ -43,7 +52,7 @@ class _SideNavPageState extends State<SideNavPage> {
             leading: const Icon(Icons.headphones_outlined),
             title: const Text(
               "Help & Support",
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             onTap: () {},
           ),
@@ -51,7 +60,7 @@ class _SideNavPageState extends State<SideNavPage> {
             leading: const Icon(Icons.logout),
             title: const Text(
               "Log Out",
-              style: TextStyle(color: Colors.black),
+              style: TextStyle(color: Colors.white),
             ),
             onTap: () {},
           ),
