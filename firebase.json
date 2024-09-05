@@ -1,1 +1,35 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"mine-track-23a18","appId":"1:143187285230:android:c9294212501f69efc24fff","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"mine-track-23a18","configurations":{"android":"1:143187285230:android:c9294212501f69efc24fff","ios":"1:143187285230:ios:97e411fd2d1bd98ac24fff","web":"1:143187285230:web:c110905c0a7a1789c24fff","windows":"1:143187285230:web:15fd2bad2275ee73c24fff"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "mine-track-23a18",
+          "appId": "1:143187285230:android:c9294212501f69efc24fff",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "mine-track-23a18",
+          "configurations": {
+            "android": "1:143187285230:android:c9294212501f69efc24fff",
+            "ios": "1:143187285230:ios:97e411fd2d1bd98ac24fff",
+            "web": "1:143187285230:web:c110905c0a7a1789c24fff",
+            "windows": "1:143187285230:web:15fd2bad2275ee73c24fff"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
+  }
+}
