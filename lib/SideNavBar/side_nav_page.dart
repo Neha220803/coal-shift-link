@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shift_link/SideNavBar/report_hazard.dart';
 
 class SideNavPage extends StatefulWidget {
   const SideNavPage({super.key});
@@ -23,22 +24,27 @@ class _SideNavPageState extends State<SideNavPage> {
             tileColor: Colors.blue[100],
             onTap: () {},
           ),
-          ListTile(
-            leading: const Icon(Icons.health_and_safety_outlined),
-            title: const Text(
-              "Safety Management Plan",
-              style: TextStyle(color: Colors.white),
-            ),
-            // tileColor: Colors.blue[100],
-            onTap: () {},
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.health_and_safety_outlined),
+          //   title: const Text(
+          //     "Safety Management Plan",
+          //     style: TextStyle(color: Colors.white),
+          //   ),
+          //   // tileColor: Colors.blue[100],
+          //   onTap: () {},
+          // ),
           ListTile(
             leading: const Icon(Icons.report),
             title: const Text(
               "Report Hazard",
               style: TextStyle(color: Colors.white),
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ReportNewHazard()));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.settings),

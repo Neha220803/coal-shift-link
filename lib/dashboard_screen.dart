@@ -72,6 +72,7 @@ class ShiftSummary extends StatelessWidget {
                 width:
                     MediaQuery.of(context).size.width, // Full width on mobile
                 child: DataTable(
+                  border: TableBorder.all(color: Colors.white),
                   columns: const <DataColumn>[
                     DataColumn(label: Text('Task')),
                     DataColumn(label: Text('Status')),
@@ -121,6 +122,7 @@ class UpcomingShifts extends StatelessWidget {
                 width:
                     MediaQuery.of(context).size.width, // Full width on mobile
                 child: DataTable(
+                  border: TableBorder.all(color: Colors.white),
                   columns: const <DataColumn>[
                     DataColumn(label: Text('Shift')),
                     DataColumn(label: Text('Assigned To')),

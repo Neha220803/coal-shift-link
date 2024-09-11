@@ -53,6 +53,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
               scrollDirection:
                   Axis.horizontal, // Make it scrollable horizontally
               child: DataTable(
+                border: TableBorder.all(color: Colors.white),
                 columns: const [
                   DataColumn(label: Text('Shift Type')),
                   DataColumn(label: Text('Start Time')),
