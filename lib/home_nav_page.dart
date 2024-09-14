@@ -3,7 +3,7 @@ import 'package:shift_link/BottomNavBar/notifications_screen.dart';
 import 'package:shift_link/BottomNavBar/safety_plan.dart';
 import 'package:shift_link/BottomNavBar/shift_screen.dart';
 import 'package:shift_link/dashboard_screen.dart';
-import 'package:shift_link/side_nav_page.dart';
+import 'package:shift_link/SideNavBar/side_nav_page.dart';
 
 class HomeNavPage extends StatefulWidget {
   const HomeNavPage({super.key});
