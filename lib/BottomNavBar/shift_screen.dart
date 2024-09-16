@@ -1,5 +1,24 @@
 import 'package:flutter/material.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Shift Management App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const ShiftScreen(),
+    );
+  }
+}
+
 class ShiftScreen extends StatefulWidget {
   const ShiftScreen({super.key});
 
@@ -27,31 +46,54 @@ class _ShiftScreenState extends State<ShiftScreen> {
     },
   ];
 
-  // For logging the new shift activities
-  final _formKey = GlobalKey<FormState>();
-  String shiftType = 'Day';
-  String operatorName = '';
-  String activitiesLog = '';
-  String equipmentStatus = 'Operational';
-  String safetyIssues = '';
-  String nextShiftTasks = '';
-  DateTime? startTime;
-  DateTime? endTime;
+  // Automatic shift scheduling form
+  final _autoFormKey = GlobalKey<FormState>();
+  int requiredOperators = 1;
+  TimeOfDay? shiftDuration;
+  DateTime startDate = DateTime.now();
+
+  // Function to generate shifts automatically
+  void _generateShifts(int operatorCount, TimeOfDay? duration) {
+    if (duration == null) return;
+
+    // Shift scheduling logic based on duration and operator count
+    DateTime currentStartTime = startDate;
+    int shiftCounter = shifts.length + 1;
+
+    for (int i = 0; i < operatorCount; i++) {
+      DateTime shiftEndTime = currentStartTime.add(
+        Duration(hours: duration.hour, minutes: duration.minute),
+      );
+
+      shifts.add({
+        'shift_id': 'shift${shiftCounter++}',
+        'shift_start_time': currentStartTime.toString(),
+        'shift_end_time': shiftEndTime.toString(),
+        'shift_type': i % 2 == 0 ? 'Day' : 'Night',
+        'operator_name': 'Auto Operator $i',
+        'status': 'Scheduled',
+      });
+
+      // Update currentStartTime for the next shift
+      currentStartTime = shiftEndTime;
+    }
+
+    setState(() {}); // Update UI after generating shifts
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shift Handover Review'),
+        title: const Text('Shift Management with Auto Scheduling'),
       ),
       body: Column(
         children: [
-          // Card to contain the shift data table
+          // Shift Data Table
           Card(
             margin: const EdgeInsets.all(12),
             child: SingleChildScrollView(
-              scrollDirection:
-                  Axis.horizontal, // Make it scrollable horizontally
+              scrollDirection: Axis.horizontal,
               child: DataTable(
                 border: TableBorder.all(color: Colors.white),
                 columns: const [
@@ -73,125 +115,72 @@ class _ShiftScreenState extends State<ShiftScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 10),
+          // Button to show form for automatic scheduling
+          ElevatedButton(
+            onPressed: () {
+              _showAutoScheduleForm(context);
+            },
+            child: const Text('Auto Schedule Shifts'),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddLogForm(context);
+          _showAddLogForm(context); // Use this to manually log shift activities
         },
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  // Function to show the form for adding a new log
-  void _showAddLogForm(BuildContext context) {
+  // Function to show the automatic shift scheduling form
+  void _showAutoScheduleForm(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Log New Shift Activities'),
+          title: const Text('Auto Schedule Shifts'),
           content: Form(
-            key: _formKey,
+            key: _autoFormKey,
             child: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  // Shift Type Dropdown
-                  DropdownButtonFormField<String>(
-                    value: shiftType,
-                    items: const [
-                      DropdownMenuItem(value: 'Day', child: Text('Day')),
-                      DropdownMenuItem(value: 'Night', child: Text('Night')),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        shiftType = value!;
-                      });
-                    },
-                    decoration: const InputDecoration(labelText: 'Shift Type'),
-                  ),
-                  // Operator Name Field
+                  // Number of operators input
                   TextFormField(
+                    keyboardType: TextInputType.number,
                     decoration:
-                        const InputDecoration(labelText: 'Operator Name'),
+                        const InputDecoration(labelText: 'Operators Required'),
                     onChanged: (value) {
-                      operatorName = value;
+                      requiredOperators = int.parse(value);
                     },
                     validator: (value) =>
-                        value!.isEmpty ? 'Enter operator name' : null,
+                        value!.isEmpty || int.parse(value) <= 0
+                            ? 'Enter valid operator count'
+                            : null,
                   ),
-                  // Activities Log Field
-                  TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: 'Activities Log'),
-                    maxLines: 2,
-                    onChanged: (value) {
-                      activitiesLog = value;
-                    },
-                    validator: (value) =>
-                        value!.isEmpty ? 'Enter activities' : null,
-                  ),
-                  // Equipment Status Dropdown
-                  DropdownButtonFormField<String>(
-                    value: equipmentStatus,
-                    items: const [
-                      DropdownMenuItem(
-                          value: 'Operational', child: Text('Operational')),
-                      DropdownMenuItem(
-                          value: 'Under Maintenance',
-                          child: Text('Under Maintenance')),
-                      DropdownMenuItem(
-                          value: 'Needs Repair', child: Text('Needs Repair')),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        equipmentStatus = value!;
-                      });
-                    },
-                    decoration:
-                        const InputDecoration(labelText: 'Equipment Status'),
-                  ),
-                  // Safety Issues Field
-                  TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: 'Safety Issues'),
-                    maxLines: 2,
-                    onChanged: (value) {
-                      safetyIssues = value;
-                    },
-                  ),
-                  // Next Shift Tasks Field
-                  TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: 'Next Shift Tasks'),
-                    maxLines: 2,
-                    onChanged: (value) {
-                      nextShiftTasks = value;
-                    },
-                  ),
-                  // Shift Start Time Picker
+                  // Shift Duration Picker
                   TextButton(
                     onPressed: () async {
-                      startTime = await showDatePicker(
+                      shiftDuration = await showTimePicker(
                         context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2022),
-                        lastDate: DateTime(2025),
+                        initialTime: const TimeOfDay(hour: 8, minute: 0),
                       );
                     },
-                    child: const Text('Select Start Time'),
+                    child: const Text('Select Shift Duration'),
                   ),
-                  // Shift End Time Picker
+                  // Start Date Picker
                   TextButton(
                     onPressed: () async {
-                      endTime = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2022),
-                        lastDate: DateTime(2025),
-                      );
+                      startDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2022),
+                            lastDate: DateTime(2025),
+                          ) ??
+                          DateTime.now();
                     },
-                    child: const Text('Select End Time'),
+                    child: const Text('Select Start Date'),
                   ),
                 ],
               ),
@@ -200,13 +189,80 @@ class _ShiftScreenState extends State<ShiftScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // Perform save operation here, like updating the database
+                if (_autoFormKey.currentState!.validate()) {
+                  // Generate shifts automatically
+                  _generateShifts(requiredOperators, shiftDuration);
                   Navigator.of(context).pop();
                 }
               },
               child: const Text('Submit'),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to show the form for logging new shift activities
+  void _showAddLogForm(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Log New Shift Activities'),
+          content: Form(
+            key: _autoFormKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  // Shift Type Dropdown
+                  DropdownButtonFormField<String>(
+                    value: 'Day',
+                    items: const [
+                      DropdownMenuItem(value: 'Day', child: Text('Day')),
+                      DropdownMenuItem(value: 'Night', child: Text('Night')),
+                    ],
+                    onChanged: (value) {},
+                    decoration: const InputDecoration(labelText: 'Shift Type'),
+                  ),
+                  // Operator Name Field
+                  TextFormField(
+                    decoration:
+                        const InputDecoration(labelText: 'Operator Name'),
+                    onChanged: (value) {},
+                  ),
+                  // Activities Log Field
+                  TextFormField(
+                    decoration:
+                        const InputDecoration(labelText: 'Activities Log'),
+                    maxLines: 2,
+                    onChanged: (value) {},
+                  ),
+                  // Equipment Status Dropdown
+                  DropdownButtonFormField<String>(
+                    value: 'Operational',
+                    items: const [
+                      DropdownMenuItem(
+                          value: 'Operational', child: Text('Operational')),
+                      DropdownMenuItem(
+                          value: 'Under Maintenance',
+                          child: Text('Under Maintenance')),
+                    ],
+                    onChanged: (value) {},
+                    decoration:
+                        const InputDecoration(labelText: 'Equipment Status'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
