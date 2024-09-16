@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shift_link/SideNavBar/pdf_report_screen.dart'; // Import the PDFReportScreen
 import 'package:shift_link/SideNavBar/report_hazard.dart';
-import 'package:shift_link/SideNavBar/setting.dart'; // Make sure to import the SettingsPage
+import 'package:shift_link/SideNavBar/setting.dart'; // Import the SettingsPage
 
 class SideNavPage extends StatefulWidget {
   const SideNavPage({super.key});
@@ -43,6 +44,25 @@ class _SideNavPageState extends State<SideNavPage> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.picture_as_pdf),
+            title: const Text(
+              "PDF Report",
+              style: TextStyle(color: Colors.white),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PDFReportScreen(
+                    completedWork: 120, // Pass your actual data here
+                    pendingWork: 80,    // Pass your actual data here
+                    danger: true,       // Pass your actual data here
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.settings),
             title: const Text(
               "Settings",
@@ -52,8 +72,7 @@ class _SideNavPageState extends State<SideNavPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      const SettingsPage(), // Navigate to SettingsPage
+                  builder: (context) => const SettingsPage(), // Navigate to SettingsPage
                 ),
               );
             },
