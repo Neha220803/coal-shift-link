@@ -46,17 +46,14 @@ class _ShiftScreenState extends State<ShiftScreen> {
     },
   ];
 
-  // Automatic shift scheduling form
   final _autoFormKey = GlobalKey<FormState>();
   int requiredOperators = 1;
   TimeOfDay? shiftDuration;
   DateTime startDate = DateTime.now();
 
-  // Function to generate shifts automatically
   void _generateShifts(int operatorCount, TimeOfDay? duration) {
-    if (duration == null) return;
+    if (duration == null || operatorCount <= 0) return;
 
-    // Shift scheduling logic based on duration and operator count
     DateTime currentStartTime = startDate;
     int shiftCounter = shifts.length + 1;
 
@@ -70,15 +67,235 @@ class _ShiftScreenState extends State<ShiftScreen> {
         'shift_start_time': currentStartTime.toString(),
         'shift_end_time': shiftEndTime.toString(),
         'shift_type': i % 2 == 0 ? 'Day' : 'Night',
-        'operator_name': 'Auto Operator $i',
+        'operator_name': 'Auto Operator ${i + 1}',
         'status': 'Scheduled',
       });
 
-      // Update currentStartTime for the next shift
       currentStartTime = shiftEndTime;
     }
 
     setState(() {}); // Update UI after generating shifts
+  }
+
+  void _showModifyShiftBottomSheet(Map<String, dynamic> shift) {
+    final TextEditingController startTimeController =
+        TextEditingController(text: shift['shift_start_time']);
+    final TextEditingController endTimeController =
+        TextEditingController(text: shift['shift_end_time']);
+    final TextEditingController operatorNameController =
+        TextEditingController(text: shift['operator_name']);
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: startTimeController,
+                decoration: const InputDecoration(labelText: 'Start Time'),
+              ),
+              TextFormField(
+                controller: endTimeController,
+                decoration: const InputDecoration(labelText: 'End Time'),
+              ),
+              TextFormField(
+                controller: operatorNameController,
+                decoration: const InputDecoration(labelText: 'Operator Name'),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        shift['shift_start_time'] = startTimeController.text;
+                        shift['shift_end_time'] = endTimeController.text;
+                        shift['operator_name'] = operatorNameController.text;
+                      });
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    child: const Text('Save'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEndShiftBottomSheet(Map<String, dynamic> shift) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Are you sure you want to end this shift?'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        shift['status'] = 'Ended';
+                      });
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    child: const Text('Yes'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    },
+                    child: const Text('No'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAutoScheduleForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _autoFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  decoration:
+                      const InputDecoration(labelText: 'Operators Required'),
+                  onChanged: (value) {
+                    requiredOperators = int.tryParse(value) ?? 1;
+                  },
+                  validator: (value) {
+                    final parsedValue = int.tryParse(value ?? '');
+                    if (parsedValue == null || parsedValue <= 0) {
+                      return 'Enter valid operator count';
+                    }
+                    return null;
+                  },
+                ),
+                TextButton(
+                  onPressed: () async {
+                    shiftDuration = await showTimePicker(
+                      context: context,
+                      initialTime: const TimeOfDay(hour: 8, minute: 0),
+                    );
+                  },
+                  child: const Text('Select Shift Duration'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    startDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2022),
+                          lastDate: DateTime(2025),
+                        ) ??
+                        DateTime.now();
+                  },
+                  child: const Text('Select Start Date'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_autoFormKey.currentState?.validate() ?? false) {
+                      _generateShifts(requiredOperators, shiftDuration);
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    }
+                  },
+                  child: const Text('Submit'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the bottom sheet
+                  },
+                  child: const Text('Cancel'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddLogForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _autoFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                DropdownButtonFormField<String>(
+                  value: 'Day',
+                  items: const [
+                    DropdownMenuItem(value: 'Day', child: Text('Day')),
+                    DropdownMenuItem(value: 'Night', child: Text('Night')),
+                  ],
+                  onChanged: (value) {},
+                  decoration: const InputDecoration(labelText: 'Shift Type'),
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Operator Name'),
+                  onChanged: (value) {},
+                ),
+                TextFormField(
+                  decoration:
+                      const InputDecoration(labelText: 'Activities Log'),
+                  maxLines: 2,
+                  onChanged: (value) {},
+                ),
+                DropdownButtonFormField<String>(
+                  value: 'Operational',
+                  items: const [
+                    DropdownMenuItem(
+                        value: 'Operational', child: Text('Operational')),
+                    DropdownMenuItem(
+                        value: 'Under Maintenance',
+                        child: Text('Under Maintenance')),
+                  ],
+                  onChanged: (value) {},
+                  decoration:
+                      const InputDecoration(labelText: 'Equipment Status'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the bottom sheet
+                  },
+                  child: const Text('Submit'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -89,7 +306,6 @@ class _ShiftScreenState extends State<ShiftScreen> {
       ),
       body: Column(
         children: [
-          // Shift Data Table
           Card(
             margin: const EdgeInsets.all(12),
             child: SingleChildScrollView(
@@ -102,21 +318,33 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   DataColumn(label: Text('End Time')),
                   DataColumn(label: Text('Operator Name')),
                   DataColumn(label: Text('Status')),
+                  DataColumn(label: Text('Actions')),
                 ],
                 rows: shifts.map((shift) {
                   return DataRow(cells: [
-                    DataCell(Text(shift['shift_type'])),
-                    DataCell(Text(shift['shift_start_time'])),
-                    DataCell(Text(shift['shift_end_time'])),
-                    DataCell(Text(shift['operator_name'])),
-                    DataCell(Text(shift['status'])),
+                    DataCell(Text(shift['shift_type'] ?? '')),
+                    DataCell(Text(shift['shift_start_time'] ?? '')),
+                    DataCell(Text(shift['shift_end_time'] ?? '')),
+                    DataCell(Text(shift['operator_name'] ?? '')),
+                    DataCell(Text(shift['status'] ?? '')),
+                    DataCell(Row(
+                      children: [
+                        TextButton(
+                          onPressed: () => _showModifyShiftBottomSheet(shift),
+                          child: const Text('Modify'),
+                        ),
+                        TextButton(
+                          onPressed: () => _showEndShiftBottomSheet(shift),
+                          child: const Text('End Shift'),
+                        ),
+                      ],
+                    )),
                   ]);
                 }).toList(),
               ),
             ),
           ),
           const SizedBox(height: 10),
-          // Button to show form for automatic scheduling
           ElevatedButton(
             onPressed: () {
               _showAutoScheduleForm(context);
@@ -131,147 +359,6 @@ class _ShiftScreenState extends State<ShiftScreen> {
         },
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  // Function to show the automatic shift scheduling form
-  void _showAutoScheduleForm(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Auto Schedule Shifts'),
-          content: Form(
-            key: _autoFormKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  // Number of operators input
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    decoration:
-                        const InputDecoration(labelText: 'Operators Required'),
-                    onChanged: (value) {
-                      requiredOperators = int.parse(value);
-                    },
-                    validator: (value) =>
-                        value!.isEmpty || int.parse(value) <= 0
-                            ? 'Enter valid operator count'
-                            : null,
-                  ),
-                  // Shift Duration Picker
-                  TextButton(
-                    onPressed: () async {
-                      shiftDuration = await showTimePicker(
-                        context: context,
-                        initialTime: const TimeOfDay(hour: 8, minute: 0),
-                      );
-                    },
-                    child: const Text('Select Shift Duration'),
-                  ),
-                  // Start Date Picker
-                  TextButton(
-                    onPressed: () async {
-                      startDate = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2022),
-                            lastDate: DateTime(2025),
-                          ) ??
-                          DateTime.now();
-                    },
-                    child: const Text('Select Start Date'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (_autoFormKey.currentState!.validate()) {
-                  // Generate shifts automatically
-                  _generateShifts(requiredOperators, shiftDuration);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Submit'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  // Function to show the form for logging new shift activities
-  void _showAddLogForm(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Log New Shift Activities'),
-          content: Form(
-            key: _autoFormKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  // Shift Type Dropdown
-                  DropdownButtonFormField<String>(
-                    value: 'Day',
-                    items: const [
-                      DropdownMenuItem(value: 'Day', child: Text('Day')),
-                      DropdownMenuItem(value: 'Night', child: Text('Night')),
-                    ],
-                    onChanged: (value) {},
-                    decoration: const InputDecoration(labelText: 'Shift Type'),
-                  ),
-                  // Operator Name Field
-                  TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: 'Operator Name'),
-                    onChanged: (value) {},
-                  ),
-                  // Activities Log Field
-                  TextFormField(
-                    decoration:
-                        const InputDecoration(labelText: 'Activities Log'),
-                    maxLines: 2,
-                    onChanged: (value) {},
-                  ),
-                  // Equipment Status Dropdown
-                  DropdownButtonFormField<String>(
-                    value: 'Operational',
-                    items: const [
-                      DropdownMenuItem(
-                          value: 'Operational', child: Text('Operational')),
-                      DropdownMenuItem(
-                          value: 'Under Maintenance',
-                          child: Text('Under Maintenance')),
-                    ],
-                    onChanged: (value) {},
-                    decoration:
-                        const InputDecoration(labelText: 'Equipment Status'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
     );
   }
 }
