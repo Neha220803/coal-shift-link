@@ -3,6 +3,10 @@ import 'package:shift_link/home_nav_page.dart';
 import 'package:shift_link/utils/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+void main() {
+  runApp(MainApp());
+}
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
