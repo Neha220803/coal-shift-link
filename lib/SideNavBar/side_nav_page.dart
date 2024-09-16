@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shift_link/SideNavBar/report_hazard.dart';
+import 'package:shift_link/SideNavBar/setting.dart'; // Make sure to import the SettingsPage
 
 class SideNavPage extends StatefulWidget {
   const SideNavPage({super.key});
@@ -22,17 +23,10 @@ class _SideNavPageState extends State<SideNavPage> {
               style: TextStyle(color: Colors.white),
             ),
             tileColor: Colors.blue[100],
-            onTap: () {},
+            onTap: () {
+              // Navigate to Dashboard
+            },
           ),
-          // ListTile(
-          //   leading: const Icon(Icons.health_and_safety_outlined),
-          //   title: const Text(
-          //     "Safety Management Plan",
-          //     style: TextStyle(color: Colors.white),
-          //   ),
-          //   // tileColor: Colors.blue[100],
-          //   onTap: () {},
-          // ),
           ListTile(
             leading: const Icon(Icons.report),
             title: const Text(
@@ -41,9 +35,11 @@ class _SideNavPageState extends State<SideNavPage> {
             ),
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ReportNewHazard()));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ReportNewHazard(),
+                ),
+              );
             },
           ),
           ListTile(
@@ -52,7 +48,15 @@ class _SideNavPageState extends State<SideNavPage> {
               "Settings",
               style: TextStyle(color: Colors.white),
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      const SettingsPage(), // Navigate to SettingsPage
+                ),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.headphones_outlined),
@@ -60,7 +64,9 @@ class _SideNavPageState extends State<SideNavPage> {
               "Help & Support",
               style: TextStyle(color: Colors.white),
             ),
-            onTap: () {},
+            onTap: () {
+              // Navigate to Help & Support
+            },
           ),
           ListTile(
             leading: const Icon(Icons.logout),
@@ -68,7 +74,9 @@ class _SideNavPageState extends State<SideNavPage> {
               "Log Out",
               style: TextStyle(color: Colors.white),
             ),
-            onTap: () {},
+            onTap: () {
+              // Handle Log Out
+            },
           ),
         ],
       ),
